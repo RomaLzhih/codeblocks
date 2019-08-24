@@ -1,3 +1,9 @@
+/*
+给你若干个开始和结束的线段，你需要的是把这些线段覆盖起来，使其能完整地盖住一段区间
+
+问题是贪心，首先做的是排除那些无用的线段（起始点相同但是长度较短），
+然后维护一个临时的上界，注意只有当现在线段的下一个线段不能覆盖住整个区间的时候才增加下一个。
+*/
 #pragma GCC optimize(3)
 #include <time.h>
 #include <algorithm>
@@ -16,6 +22,7 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -36,7 +43,8 @@ inline int READ() {
 
 #define REP(i, a, b) for (int i = (a); i <= (b); i++)
 #define PER(i, a, b) for (int i = (a); i >= (b); i--)
-#define FOREACH(i, t) for (typeof(t.begin()) i = t.begin(); i != t.end(); i++)
+//#define FOREACH(i, t) for (decltype(t.begin()) i = t.begin(); i != t.end();
+// i++)
 #define MP(x, y) make_pair(x, y)
 #define PB(x) push_back(x)
 #define SET(a) memset(a, -1, sizeof(a))
@@ -51,16 +59,49 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-int N, T;
-priority_queue<pii> q;
+
+int N, T, cnt;
+struct cow {
+    int l, r;
+    cow(int x, int y) : l(x), r(y) {}
+    bool operator<(const cow &rhs) const {
+        return l == rhs.l ? r > rhs.r : l < rhs.l;
+    }
+};
+set<cow> s;
+map<int, int> mp;
 
 int main() {
+    // freopen("input.txt", "r", stdin);
     N = READ(), T = READ();
     pii a;
     REP(i, 1, N) {
         a.first = READ(), a.second = READ();
-        q.push(a);
+        if (mp[a.first] < a.second) mp[a.first] = a.second;
     }
-
+    /*  cout << endl;
+     for (auto i : mp) cout << i.first << " " << i.second << endl; */
+    int up = 0, tmp = 0, flag = 0;
+    for (map<int, int>::iterator i = mp.begin(); i != mp.end(); i++) {
+        int l = (*i).first, r = (*i).second;
+        if (l <= up + 1) {
+            if (r > tmp) {
+                tmp = r;
+                flag = 1;
+            }
+            map<int, int>::iterator it = i;
+            it++;
+            if ((it == mp.end() && up < T && tmp >= T) ||
+                ((*it).first > up + 1 && flag)) {
+                up = tmp;
+                cnt++;
+                flag = 0;
+            }
+        }
+    }
+    if (up >= T)
+        printf("%d", cnt);
+    else
+        printf("-1");
     return 0;
 }
