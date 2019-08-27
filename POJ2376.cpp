@@ -72,7 +72,7 @@ set<cow> s;
 map<int, int> mp;
 
 int main() {
-    // freopen("input.txt", "r", stdin);
+    freopen("input.txt", "r", stdin);
     N = READ(), T = READ();
     pii a;
     REP(i, 1, N) {
