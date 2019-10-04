@@ -49,22 +49,41 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 10000 + 5
 ///**********************************START*********************************///
 
-// 在一个单调数组里面二分查找某一个值 k
-int n, k;
-int a[MAXN];
+int N, K;
+double L[MAXN];
+
+bool C(double x) {
+    int num = 0;
+    for (int i = 0; i < N; i++) {
+        num += (int)(L[i] / x);
+    }
+    return num >= K;
+}
 
 void solve() {
-    int lb = -1, ub = n;
-    while (ub - lb > 1) {
-        int mid = (lb + ub) / 2;
-        if (a[mid] >= k) {
-            ub = mid;
-        } else {
+    // 初始化解的范围
+    double lb = 0, ub = INF * 1.0;
+
+    // 重复循环，直到解的范围足够小
+    for (int i = 0; i < 100; i++) {
+        double mid = (lb + ub) / 2;
+        if (C(mid))
             lb = mid;
-        }
+        else
+            ub = mid;
     }
-    printf("%d\n", ub);
+    printf("%.2f\n", floor(ub * 100) / 100);
+}
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+#endif
+    scanf("%d %d", &N, &K);
+    for (int i = 0; i < N; i++) scanf("%lf", &L[i]);
+    solve();
+    return 0;
 }

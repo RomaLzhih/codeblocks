@@ -49,22 +49,58 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 5000 + 5
 ///**********************************START*********************************///
 
-// 在一个单调数组里面二分查找某一个值 k
-int n, k;
-int a[MAXN];
+int N;
+int dir[MAXN];  // 牛的方向（0：F，1：B）
+int f[MAXN];    //区间（i，i-K+1）是否进行反转
+
+//固定K，求对应的最小操作回数
+//无解返回-1
+int calc(int K) {
+    MEM(f, 0);
+    int res = 0;
+    int sum = 0;  // f的和
+    for (int i = 0; i + K <= N; i++) {
+        if ((dir[i] + sum) % 2 != 0) {
+            // 前端的牛朝后方
+            res++;
+            f[i] = 1;
+        }
+        sum += f[i];
+        if (i - K + 1 >= 0) sum -= f[i - K + 1];
+    }
+    //检查剩下的牛是否有朝后方的情况
+    for (int i = N - K + 1; i < N; i++) {
+        if ((dir[i] + sum) % 2 != 0) return -1;  //无解
+        if (i - K + 1 >= 0) sum -= f[i - K + 1];
+    }
+    return res;
+}
 
 void solve() {
-    int lb = -1, ub = n;
-    while (ub - lb > 1) {
-        int mid = (lb + ub) / 2;
-        if (a[mid] >= k) {
-            ub = mid;
-        } else {
-            lb = mid;
+    int K = 1, M = N;
+    for (int k = 1; k <= N; k++) {
+        int m = calc(k);
+        if (m > 0 && M > m) {
+            M = m;
+            K = k;
         }
     }
-    printf("%d\n", ub);
+    printf("%d %d\n", K, M);
+}
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+#endif
+    scanf("%d", &N);
+    REP(i, 0, N - 1) {
+        char c[2];
+        scanf("%s", c);
+        dir[i] = (c[0] == 'F') ? 0 : 1;
+    }
+    solve();
+    return 0;
 }

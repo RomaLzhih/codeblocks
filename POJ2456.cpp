@@ -49,22 +49,43 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 100000 + 5
 ///**********************************START*********************************///
+int N, M;
+int x[MAXN];
 
-// 在一个单调数组里面二分查找某一个值 k
-int n, k;
-int a[MAXN];
+bool C(int d) {
+    int last = 1;
+    for (int i = 1; i < M; i++) {
+        int crt = last + 1;
+        while (crt <= N && x[crt] - x[last] < d) {
+            crt++;
+        }
+        if (crt == N + 1) return false;
+        last = crt;
+    }
+    return true;
+}
 
 void solve() {
-    int lb = -1, ub = n;
+    sort(x + 1, x + 1 + N);
+    int lb = 0, ub = INF;
     while (ub - lb > 1) {
-        int mid = (lb + ub) / 2;
-        if (a[mid] >= k) {
-            ub = mid;
-        } else {
+        int mid = (ub + lb) / 2;
+        if (C(mid))
             lb = mid;
-        }
+        else
+            ub = mid;
     }
-    printf("%d\n", ub);
+    printf("%d\n", lb);
+}
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+#endif
+    scanf("%d %d", &N, &M);
+    for (int i = 1; i <= N; i++) scanf("%d", &x[i]);
+    solve();
+    return 0;
 }
