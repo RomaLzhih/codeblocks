@@ -51,51 +51,20 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-char g[25][25];
-int n, m;
-const int dx[] = {1, -1, 0, 0};
-const int dy[] = {0, 0, 1, -1};
-bool check_x(int x, int y) {
-    char ch = g[x][y];
-    for (int i = 0; i < 4; i++) {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        int num = 1;
-        while (nx >= 0 && ny >= 0 && nx < n && ny < m) {
-            if (g[nx][ny] == g[x][y]) {
-                if (num <= 2) {
-                    nx += dx[i];
-                    ny += dy[i];
-                    num++;
-                } else {
-                    g[nx][ny] = '0';
-                    g[nx - dx[i]][ny - dy[i]] = '0';
-                }
-            }
-        }
-    }
-}
-void drop() {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            if(g[])
-        }
-    }
-}
+
+#include "Stack.h"
+
 int main() {
-    scanf("%d%d", &n, &m);
-    for (int i = 0; i < n; i++) {
-        scanf("%s", g[i]);
+    Stack S = createStack();
+    push(S, 1);
+    push(S, 2);
+    push(S, 3);
+    push(S, 4);
+    push(S, 5);
+    cout << size(S) << endl;
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", top(S));
+        pop(S);
     }
-    int x1, y1, x2, y2;
-    scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-    swap(g[x1][y1], g[x2][y2]);
-    bool flag = false;
-    while (flag == false) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if () check_x(i, j)
-            }
-        }
-    }
+    return 0;
 }
