@@ -49,54 +49,59 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 11
+#define MAXM 31
 ///**********************************START*********************************///
 
-typedef vector<int> vec;
-typedef vector<vec> mat;
+int n, m, a, b, p;
+int t[MAXN];
+int d[MAXM][MAXM];
+double dp[1 << 12][MAXM];
 
-//计算A*B
-mat mul(mat &A, mat &B) {
-    mat C(A.size(), vec(B[0].size()));
-    for (int i = 0; i < A.size(); i++) {
-        for (int k = 0; k < B.size(); k++) {
-            for (int j = 0; j < B[0].size(); j++) {
-                C[i][j] = (C[i][j] + A[i][k] * B[k][j]) % MOD;
+void solve() {
+    for (int i = 0; i < 1 << n; i++) {
+        fill(dp[i], dp[i] + m, INF);
+    }
+    dp[(1 << n) - 1][a - 1] = 0;
+    double res = INF;
+    for (int S = (1 << n) - 1; S >= 0; S--) {
+        res = min(res, dp[S][b - 1]);
+        for (int v = 0; v < m; v++) {
+            for (int i = 0; i < n; i++) {
+                if (S >> i & 1) {
+                    for (int u = 0; u < m; u++) {
+                        if (d[v][u] >= 0) {
+                            dp[S & ~(1 << i)][u] =
+                                min(dp[S & ~(1 << i)][u],
+                                    dp[S][v] + (double)d[v][u] / t[i]);
+                        }
+                    }
+                }
             }
         }
     }
-    return C;
-}
-
-//计算A^n
-mat mat_pow(mat A, LL n) {
-    mat B(A.size(), vec(A.size()));
-    for (int i = 0; i < A.size(); i++) {
-        B[i][i] = 1;
+    if (res == INF) {
+        printf("Impossible\n");
+    } else {
+        printf("%.3f\n", res);
     }
-    while (n > 0) {
-        if (n & 1) B = mul(B, A);
-        A = mul(A, A);
-        n >>= 1;
-    }
-    return B;
-}
-
-LL n;
-
-void solve() {
-    mat A(2, vec(2));
-    A[0][0] = 1;
-    A[0][1] = 1;
-    A[1][0] = 1;
-    A[1][1] = 0;
-    A = mat_pow(A, n);
-    printf("%d\n", A[1][0]);
 }
 
 int main() {
-    cin >> n;
-    cout << "hellow" << endl;
-    solve();
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+#endif  // !ONLINE_JUDGE
+    while (scanf("%d%d%d%d%d", &n, &m, &p, &a, &b) != EOF) {
+        if (p == 0 && m == 0 && n == 0 && a == 0 && b == 0) break;
+        MEM(t, 0), MEM(d, 0), MEM(dp, 0);
+        REP(i, 0, n - 1) scanf("%d", &t[i]);
+        REP(i, 0, MAXM - 1) REP(j, 0, MAXM - 1) d[i][j] = -1;
+        REP(i, 1, p) {
+            int u = READ(), v = READ(), w = READ();
+            u--, v--;
+            d[u][v] = d[v][u] = w;
+        }
+        solve();
+    }
     return 0;
 }

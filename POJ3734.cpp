@@ -48,7 +48,7 @@ inline int READ() {
 #define Rson (index * 2 + 1)
 #define pii pair<int, int>
 #define pll pair<LL, LL>
-#define MOD ((int)1000000007)
+#define MOD ((int)10007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
 
@@ -69,7 +69,7 @@ mat mul(mat &A, mat &B) {
 }
 
 //计算A^n
-mat mat_pow(mat A, LL n) {
+mat mat_pow(mat A, int n) {
     mat B(A.size(), vec(A.size()));
     for (int i = 0; i < A.size(); i++) {
         B[i][i] = 1;
@@ -82,21 +82,25 @@ mat mat_pow(mat A, LL n) {
     return B;
 }
 
-LL n;
+int N;
 
 void solve() {
-    mat A(2, vec(2));
-    A[0][0] = 1;
+    mat A(3, vec(3));
+    A[0][0] = 2;
     A[0][1] = 1;
-    A[1][0] = 1;
-    A[1][1] = 0;
-    A = mat_pow(A, n);
-    printf("%d\n", A[1][0]);
+    A[0][2] = 0;
+    A[1][0] = 2;
+    A[1][1] = 2;
+    A[1][2] = 2;
+    A[2][0] = 0;
+    A[2][1] = 1;
+    A[2][2] = 2;
+    // A = mat_pow(A, N);
+    printf("%d\n", A[0][0]);
 }
 
 int main() {
-    cin >> n;
-    cout << "hellow" << endl;
+    scanf("%d", &N);
     solve();
     return 0;
 }
