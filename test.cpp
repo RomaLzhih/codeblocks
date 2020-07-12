@@ -53,7 +53,8 @@ inline int READ() {
 ///**********************************START*********************************///
 
 int main() {
-    int m = 2 >> 1;
-    cout << m << endl;
+    int m = 2;
+    int n = 3;
+    cout << m / n << endl;
     return 0;
 }

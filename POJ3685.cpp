@@ -21,7 +21,7 @@
 using namespace std;
 const double EPS = 1e-9;
 const int INF = 2147483647;
-const long long LLINF = 9223372036854775807;
+const long long LLINF = 0x3f3f3f3f3f3f3f3f;
 const double PI = acos(-1.0);
 
 inline int READ() {
@@ -51,29 +51,40 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-int N, K;
-int a[MAXN], b[MAXN], y[MAXN];
+LL N, M;
 
-bool C(double x) {
-    int t = N - K;
-    for (int i = 0; i < N; i++) y[i] = a[i] - x * b[i];
-    sort(y, y + N);
-    double sum = 0.0;
-    for (int i = N; i > N - t; i--) sum += y[i];
-    return sum >= 0;
+LL cal(LL i, LL j) { return i * i + 100000 * i + j * j - 100000 * j + i * j; }
+
+bool C(LL x) {
+    LL sum = 0;
+    for (int j = 1; j <= N; j++) {
+        LL ub = N + 1, lb = 0;
+        LL ans = 0;
+        while (ub - lb > 1) {
+            LL mid = (ub + lb) >> 1;
+            if (cal(mid, j) <= x) {
+                ans = mid;
+                lb = mid;
+            } else {
+                ub = mid;
+            }
+        }
+        sum += ans;
+    }
+    return sum >= M;
 }
 
 void solve() {
-    double ub = INF, lb = 0;
-    for (int i = 0; i < 100; i++) {
-        double mid = (ub + lb) / 2;
+    LL ub = LLINF, lb = -LLINF;
+    while (ub - lb > 1) {
+        LL mid = (ub + lb) >> 1;
         if (C(mid)) {
-            lb = mid;
-        } else {
             ub = mid;
+        } else {
+            lb = mid;
         }
     }
-    cout << round(lb) << endl;
+    cout << ub << endl;
     return;
 }
 
@@ -81,10 +92,10 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif  // !ONLINE_JUDGE
-    while (cin >> N >> K) {
-        if (N == 0 && K == 0) break;
-        for (int i = 0; i < N; i++) cin >> a[i];
-        for (int i = 0; i < N; i++) cin >> b[i];
+    int T = READ();
+    while (T--) {
+        getchar();
+        scanf("%lld%lld", &N, &M);
         solve();
     }
     return 0;

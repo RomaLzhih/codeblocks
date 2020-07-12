@@ -51,41 +51,11 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-int N, K;
-int a[MAXN], b[MAXN], y[MAXN];
-
-bool C(double x) {
-    int t = N - K;
-    for (int i = 0; i < N; i++) y[i] = a[i] - x * b[i];
-    sort(y, y + N);
-    double sum = 0.0;
-    for (int i = N; i > N - t; i--) sum += y[i];
-    return sum >= 0;
-}
-
-void solve() {
-    double ub = INF, lb = 0;
-    for (int i = 0; i < 100; i++) {
-        double mid = (ub + lb) / 2;
-        if (C(mid)) {
-            lb = mid;
-        } else {
-            ub = mid;
-        }
-    }
-    cout << round(lb) << endl;
-    return;
-}
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif  // !ONLINE_JUDGE
-    while (cin >> N >> K) {
-        if (N == 0 && K == 0) break;
-        for (int i = 0; i < N; i++) cin >> a[i];
-        for (int i = 0; i < N; i++) cin >> b[i];
-        solve();
-    }
+
     return 0;
 }

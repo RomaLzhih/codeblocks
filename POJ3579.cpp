@@ -49,31 +49,33 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 100000 + 5
 ///**********************************START*********************************///
-int N, K;
-int a[MAXN], b[MAXN], y[MAXN];
+int N;
+int a[MAXN];
+LL M;
 
-bool C(double x) {
-    int t = N - K;
-    for (int i = 0; i < N; i++) y[i] = a[i] - x * b[i];
-    sort(y, y + N);
-    double sum = 0.0;
-    for (int i = N; i > N - t; i--) sum += y[i];
-    return sum >= 0;
+bool C(int t) {
+    LL cnt = 0;
+    for (int i = 0; i < N; i++) {
+        cnt += N - (lower_bound(a + i + 1, a + N, a[i] + t) - a);
+    }
+    return cnt <= M / 2;
 }
 
 void solve() {
-    double ub = INF, lb = 0;
-    for (int i = 0; i < 100; i++) {
-        double mid = (ub + lb) / 2;
+    sort(a, a + N);
+    M = N * (N - 1) / 2;
+    int ub = a[N - 1] + 1, lb = 0;
+    while (ub - lb > 1) {
+        int mid = (ub + lb) >> 1;
         if (C(mid)) {
-            lb = mid;
-        } else {
             ub = mid;
+        } else {
+            lb = mid;
         }
     }
-    cout << round(lb) << endl;
+    cout << lb << endl;
     return;
 }
 
@@ -81,10 +83,10 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif  // !ONLINE_JUDGE
-    while (cin >> N >> K) {
-        if (N == 0 && K == 0) break;
-        for (int i = 0; i < N; i++) cin >> a[i];
-        for (int i = 0; i < N; i++) cin >> b[i];
+    while (~scanf("%d", &N)) {
+        for (int i = 0; i < N; i++) {
+            scanf("%d", &a[i]);
+        }
         solve();
     }
     return 0;

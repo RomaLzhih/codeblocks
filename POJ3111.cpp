@@ -49,31 +49,52 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 100000 + 5
 ///**********************************START*********************************///
 int N, K;
-int a[MAXN], b[MAXN], y[MAXN];
+vector<int> ans;
+struct node {
+    int v, w, id;
+} a[MAXN];
 
-bool C(double x) {
-    int t = N - K;
-    for (int i = 0; i < N; i++) y[i] = a[i] - x * b[i];
-    sort(y, y + N);
-    double sum = 0.0;
-    for (int i = N; i > N - t; i--) sum += y[i];
+struct NODE {
+    int tot, id;
+    bool operator<(NODE &rhs) const { return tot > rhs.tot; }
+} V[MAXN];
+
+bool C(int x) {
+    ans.clear();
+    for (int i = 0; i < N; i++) {
+        V[i].tot = a[i].v - x * a[i].w;
+        V[i].id = a[i].id;
+    }
+    sort(V, V + N);
+    int sum = 0;
+    for (int i = 0; i < K; i++) {
+        sum += V[i].tot;
+        ans.push_back(V[i].id);
+    }
     return sum >= 0;
 }
 
 void solve() {
-    double ub = INF, lb = 0;
-    for (int i = 0; i < 100; i++) {
-        double mid = (ub + lb) / 2;
+    int ub = INF, lb = 0;
+    while (ub - lb > 1) {
+        int mid = (ub + lb) >> 1;
         if (C(mid)) {
             lb = mid;
         } else {
             ub = mid;
         }
     }
-    cout << round(lb) << endl;
+    sort(ans.begin(), ans.end());
+    for (int i = 0; i < ans.size(); i++) {
+        if (i == 0) {
+            printf("%d", ans[i]);
+        } else {
+            printf(" %d", ans[i]);
+        }
+    }
     return;
 }
 
@@ -81,11 +102,11 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif  // !ONLINE_JUDGE
-    while (cin >> N >> K) {
-        if (N == 0 && K == 0) break;
-        for (int i = 0; i < N; i++) cin >> a[i];
-        for (int i = 0; i < N; i++) cin >> b[i];
-        solve();
+    N = READ(), K = READ();
+    for (int i = 0; i < N; i++) {
+        a[i].v = READ(), a[i].w = READ();
+        a[i].id = i + 1;
     }
+    solve();
     return 0;
 }
