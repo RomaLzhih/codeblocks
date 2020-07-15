@@ -36,7 +36,7 @@ inline int READ() {
 }
 
 #define rep(i, a, b) for (int i = (a); i <= (b); i++)
-#define per(i, a, b) for (int i = (a); i >= (b); i--)
+#define PER(i, a, b) for (int i = (a); i >= (b); i--)
 #define FOREACH(i, t) for (typeof(t.begin()) i = t.begin(); i != t.end(); i++)
 #define MP(x, y) make_pair(x, y)
 #define PB(x) push_back(x)
@@ -52,11 +52,48 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-set<int> s = {1, 2, 3, 4, 5};
+LL T;
+vector<vector<LL>> ans;
+
+LL poww(LL num) { return num * num; }
+
+bool cmp(const vector<LL>& v1, const vector<LL>& v2) {
+    return v1.size() > v2.size();
+}
+
 int main() {
-#ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin);
-#endif
-    cout << *s.lower_bound(2.3) << endl;
+    while (cin >> T) {
+        // T = 2030;
+        LL s = 1, t = 1;
+        LL sum = 0;
+        LL len = (int)sqrt(T * 1.0) + 1;
+        ans.clear();
+        for (;;) {
+            while (poww(t) <= T && sum < T) {
+                sum += poww(t++);
+            }
+            if (sum < T) break;
+            if (sum == T) {
+                vector<LL> v;
+                for (int i = s; i < t; i++) {
+                    v.push_back(i);
+                }
+                ans.push_back(v);
+            }
+            sum -= poww(s++);
+            if (poww(s) > T) break;
+        }
+
+        sort(ans.begin(), ans.end(), cmp);
+        printf("%d\n", ans.size());
+        for (int i = 0; i < ans.size(); i++) {
+            printf("%d", ans[i].size());
+            // sort(ans[i].begin(), ans[i].end());
+            for (int j = 0; j < ans[i].size(); j++) {
+                printf(" %lld", ans[i][j]);
+            }
+            printf("\n");
+        }
+    }
     return 0;
 }

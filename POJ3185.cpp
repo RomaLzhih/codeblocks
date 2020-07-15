@@ -50,13 +50,49 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 20 + 5
 ///**********************************START*********************************///
-set<int> s = {1, 2, 3, 4, 5};
+int N = 20;
+int dir[MAXN];
+int f[MAXN];
+
+// 0, 1
+bool CanFlip(int i, int sum) { return (dir[i] + sum) & 1; }
+
+int solve() {
+    MEM(f, 0);
+    int res = 0, sum = 0;
+    int K = 3;
+    // 在开关问题的时候，这里是 i+K<=N，为什么？
+    // 假如 K=3，那么当 i=18
+    // 的时候，他就不能翻了，(这也是为什么在判断最后几位的时候没有sum+=f[i]).
+    // 但是这里当 i=18 的时候还可以翻， 所以往前推一位
+    for (int i = 0; i + K <= N + 1; i++) {
+        if (CanFlip(i, sum)) {
+            res++;
+            f[i] = 1;
+        }
+        sum += f[i];
+        if (i - K + 1 >= 0) sum -= f[i - K + 1];
+    }
+    for (int i = N - K + 1 + 1; i < N; i++) {
+        if (CanFlip(i, sum)) return INF;  //无解
+        if (i - K + 1 >= 0) sum -= f[i - K + 1];
+    }
+    return res;
+}
+
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    cout << *s.lower_bound(2.3) << endl;
+    for (int i = 0; i < 20; i++) {
+        scanf("%d", &dir[i]);
+    }
+    int ans1 = solve();
+    reverse(dir, dir + 20);
+    int ans2 = solve();
+    // cout << ans1 << " " << ans2 << endl;
+    printf("%d", min(ans1, ans2));
     return 0;
 }
