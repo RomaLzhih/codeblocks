@@ -1,5 +1,6 @@
 #pragma GCC optimize(3)
 #include <time.h>
+
 #include <algorithm>
 #include <bitset>
 #include <cctype>
@@ -56,6 +57,7 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif  // !ONLINE_JUDGE
-
+    vector<int> v = {1, 2, 3, 4};
+    cout << v[0] << endl;
     return 0;
 }

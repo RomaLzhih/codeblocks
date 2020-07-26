@@ -17,13 +17,14 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <typeinfo>
 #include <utility>
 #include <vector>
+using namespace std;
 using namespace std;
 const double EPS = 1e-9;
 const int INF = 2147483647;
 const long long LLINF = 9223372036854775807;
-const double PI = acos(-1.0);
 
 inline int READ() {
     char ch;
@@ -50,16 +51,58 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 20000 + 5
 ///**********************************START*********************************///
+int N;
+struct COW {
+    LL v, x;
+    bool operator<(const COW& rhs) const {
+        return v == rhs.v ? x < rhs.x : v < rhs.v;
+    }
+} cow[MAXN];
+
+LL cnt_bit[MAXN], dis_bit[MAXN];
+LL sum(LL* bit, int i) {
+    LL s = 0;
+    while (i > 0) {
+        s += bit[i];
+        i -= i & -i;
+    }
+    return s;
+}
+
+void add(LL* bit, int i, LL x) {
+    // 注意由于我们之前用距离做下标，所以这里的上界应该是MAXN，就是最远距离
+    while (i <= MAXN) {
+        bit[i] += x;
+        i += i & -i;
+    }
+}
+
+// [from, to)
+LL cal_sum(LL* bit, int from, int to) {
+    return sum(bit, to - 1) - sum(bit, from - 1);
+}
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    vector<int> v = {1, 2, 3, 4};
-    for (auto i : v) {
-        cout << i << endl;
+    CLR(cnt_bit), CLR(dis_bit);
+    scanf("%d", &N);
+    rep(i, 1, N) scanf("%lld %lld", &cow[i].v, &cow[i].x);
+    sort(cow + 1, cow + N + 1);
+    LL ans = 0;
+    for (int i = 1; i <= N; i++) {
+        int v = cow[i].v, x = cow[i].x;
+        LL LeftCow = cal_sum(cnt_bit, 1, x);
+        LL RightCow = cal_sum(cnt_bit, x + 1, MAXN + 1);
+        // cout << LeftCow << " " << RightCow << endl;
+        ans += v * (LeftCow * x - cal_sum(dis_bit, 1, x) +
+                    cal_sum(dis_bit, x + 1, MAXN + 1) - RightCow * x);
+        add(cnt_bit, x, 1);
+        add(dis_bit, x, x);
     }
+    printf("%lld\n", ans);
     return 0;
 }
