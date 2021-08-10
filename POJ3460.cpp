@@ -50,12 +50,23 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 20
 ///**********************************START*********************************///
 
-int N = 5;
-int a[6] = {0, 1, 2, 3, 4, 5};
-int b[6];
+int a[MAXN], b[MAXN], A[MAXN];
+int N;
+
+// return number of wrong descent
+inline int check() {  //! 错误这里，int写成bool
+    int cnt = 0;
+    for (int i = 1; i < N; i++) {
+        if (a[i + 1] != a[i] + 1) cnt++;
+    }
+    if (a[N] != N) cnt++;
+    return cnt;
+}
+
+// [st,ed] insert to [tar
 void move(int st, int ed, int tar) {
     int p = 1;
     for (int i = 1; i < st; i++) {
@@ -71,20 +82,55 @@ void move(int st, int ed, int tar) {
         b[p++] = a[i];
     }
     memcpy(a, b, sizeof(b));
-    rep(i, 1, N) cout << a[i] << " ";
-    cout << endl;
+    // rep(i, 1, N) cout << a[i] << " ";
+    // cout << endl;
     return;
+}
+
+bool dfs(int deep, int maxDeep) {
+    int cost = check();
+    if (cost == 0) {  //!错在这里了，把cost写成check
+        return true;
+    }
+    if (3 * deep + cost > 3 * maxDeep) {
+        return false;
+    }
+
+    int c[MAXN];
+    memcpy(c, a, sizeof(a));
+    for (int i = 1; i < N; i++) {
+        for (int j = i; j < N; j++) {
+            for (int k = j + 1; k <= N; k++) {
+                move(i, j, k);
+                if (dfs(deep + 1, maxDeep) == true) return true;
+                memcpy(a, c, sizeof(c));
+            }
+        }
+    }
+    return false;
 }
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    for (int i = 1; i <= N; i++) {
-        for (int j = i; j <= N; j++) {
-            for (int k = j + 1; k <= N; k++) {
-                move(i, j, k);
+    int T = READ();
+    while (T--) {
+        N = READ();
+        rep(i, 1, N) a[i] = READ();
+        bool flag = false;
+        memcpy(A, a, sizeof(a));
+
+        for (int maxDeep = 0; maxDeep <= 4; maxDeep++) {
+            // memcpy(a, A, sizeof(A));
+            if (dfs(0, maxDeep)) {
+                flag = true;
+                printf("%d\n", maxDeep);
+                break;
             }
+        }
+        if (!flag) {
+            printf("5 or more\n");
         }
     }
     return 0;
