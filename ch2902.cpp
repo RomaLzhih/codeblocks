@@ -50,81 +50,75 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 3 + 5
+#define MAXN 30
 ///**********************************START*********************************///
-int g[MAXN][MAXN];
-int tmp[MAXN][MAXN];
-int ans[MAXN][MAXN];
-int first_line[MAXN];
-bool flag;
-
-void flip(int i, int j) {
-    tmp[i][j] = !tmp[i][j];
-    tmp[i - 1][j] = !tmp[i - 1][j];
-    tmp[i + 1][j] = !tmp[i + 1][j];
-    tmp[i][j - 1] = !tmp[i][j - 1];
-    tmp[i][j + 1] = !tmp[i][j + 1];
-    return;
-}
+int N;
+int q[MAXN], b[MAXN], c[MAXN];
+int ans[MAXN];
+char g[3][MAXN];
+bool vis[MAXN], visAlpha[MAXN];
 
 bool check() {
-    rep(i, 1, 5) rep(j, 1, 6) if (tmp[i][j]) return 0;
-    return 1;
+    for (int i = N - 1, t = 0; i >= 0; i--) {
+        int a = ans[g[0][i] - 'A'], b = ans[g[1][i] - 'A'],
+            c = ans[g[2][i] - 'A'];
+        if (a != -1 && b != -1 && c != -1) {
+            if (t == -1) {
+                if ((a + b) % N != c && (a + b + 1) % N != c) return false;
+                if (!i && a + b >= N) return false;  // 最高位有进位
+            } else {
+                if ((a + b + t) % N != c) return false;
+                if (!i && a + b + t >= N) return false;
+                t = (a + b + t) / N;
+            }
+        } else
+            t = -1;
+    }
+    return true;
 }
 
-void dfs(int idx) {
-    if (flag) return;
+bool dfs(int alpha) {
+    if (alpha == N) return 1;
 
-    if (idx == 7) {
-        MEM(ans, 0);
-        memcpy(tmp, g, sizeof(g));
-        // flip first line
-        rep(j, 1, 6) if (first_line[j]) {
-            flip(1, j);
-            ans[1][j] = 1;
+    for (int i = 0; i < N; i++) {
+        if (vis[i]) continue;
+        vis[i] = true;
+        ans[q[alpha]] = i;
+        if (check() && dfs(alpha + 1)) {
+            return 1;
         }
-        // flip other lines
-        rep(i, 2, 5) rep(j, 1, 6) if (tmp[i - 1][j]) {
-            flip(i, j);
-            ans[i][j] = 1;
-        }
-
-        if (check()) {
-            flag = 1;
-        }
-
-        return;
+        ans[q[alpha]] = -1;
+        vis[i] = false;
     }
-
-    for (int i = 0; i <= 1; i++) {
-        first_line[idx] = i;
-        dfs(idx + 1);
-        if (flag) return;
-    }
-
-    return;
+    return 0;
 }
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    int T = READ();
-    for (int t = 1; t <= T; t++) {
-        rep(i, 1, 5) rep(j, 1, 6) g[i][j] = READ();
-        flag = false;
-        dfs(1);
-
-        printf("PUZZLE #%d\n", t);
-        for (int i = 1; i <= 5; i++) {
-            for (int j = 1; j <= 6; j++) {
-                if (j == 1)
-                    printf("%d", ans[i][j]);
-                else
-                    printf(" %d", ans[i][j]);
-            }
-            printf("\n");
-        }
+    N = READ();
+    for (int i = 0; i < 3; i++) {
+        scanf("%s", g[i]);
+        // reverse(g[i], g[i] + N);
     }
+
+    for (int i = N - 1, k = 0; i >= 0; i--)
+        for (int j = 0; j < 3; j++) {
+            int c = g[j][i] - 'A';
+            if (!vis[c]) {
+                vis[c] = true;
+                q[k++] = c;
+            }
+        }
+
+    for (int i = 0; i < N; i++) {
+        ans[i] = -1;
+        vis[i] = 0;
+    }
+    dfs(0);
+
+    printf("%d", ans[0]);
+    rep(i, 1, N - 1) printf(" %d", ans[i]);
     return 0;
 }
