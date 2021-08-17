@@ -1,5 +1,6 @@
 #pragma GCC optimize(3)
 #include <time.h>
+
 #include <algorithm>
 #include <bitset>
 #include <cctype>
