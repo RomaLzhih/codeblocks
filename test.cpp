@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -52,40 +53,23 @@ inline int READ() {
 #define MOD ((int)1000000007)
 #define MAXN 1000 + 5
 ///**********************************START*********************************///
-
-int N = 5;
-int a[6] = {0, 1, 2, 3, 4, 5};
-int b[6];
-void move(int st, int ed, int tar) {
-    int p = 1;
-    for (int i = 1; i < st; i++) {
-        b[p++] = a[i];
-    }
-    for (int i = ed + 1; i <= tar; i++) {
-        b[p++] = a[i];
-    }
-    for (int i = st; i <= ed; i++) {
-        b[p++] = a[i];
-    }
-    for (int i = tar + 1; i <= N; i++) {
-        b[p++] = a[i];
-    }
-    memcpy(a, b, sizeof(b));
-    rep(i, 1, N) cout << a[i] << " ";
-    cout << endl;
-    return;
-}
+int a[MAXN], b[MAXN];
+int l1, l2;
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    for (int i = 1; i <= N; i++) {
-        for (int j = i; j <= N; j++) {
-            for (int k = j + 1; k <= N; k++) {
-                move(i, j, k);
-            }
-        }
+    int mn = INF, mx = -INF;
+    for (int i = 0; i < l1; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
     }
+    int mid = (mn + mx) >> 1;
+    sort(b, b + l2);
+    int rb = *lower_bound(b, b + l2, mid);
+    int lb = *upper_bound(b, b + l2, mid);
+    int ans = (rb - mid < lb - mid) ? rb : lb;
+    cout << min(abs(mn - ans), abs(mx - ans)) << endl;
     return 0;
 }
