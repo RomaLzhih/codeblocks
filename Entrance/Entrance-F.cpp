@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <deque>
-#include <fstream>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -51,25 +50,58 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 1000 + 5
+#define MAXN 10000 + 5
+#define MAXM 10000 + 5
 ///**********************************START*********************************///
-int a[MAXN], b[MAXN];
-int l1, l2;
+const int N = 2005, M = 4000010;
+int head[N], ver[M], edge[M], Next[M];
+double d[N];
+int n, m, tot;
+queue<int> q;
+bool v[N];
+
+void add(int x, int y, int z) {
+    ver[++tot] = y, edge[tot] = z, Next[tot] = head[x], head[x] = tot;
+}
+
+void spfa(int s) {
+    d[s] = 100;
+    v[s] = 1;
+    q.push(s);
+    while (q.size()) {
+        int x = q.front();
+        // cout << x << endl;
+        q.pop();
+        v[x] = 0;
+        for (int i = head[x]; i; i = Next[i]) {
+            int y = ver[i], z = edge[i];
+            // cout << y << endl;
+            if (d[y] > d[x] / (1.0 - 0.01 * z)) {
+                d[y] = d[x] / (1.0 - 0.01 * z);
+                if (!v[y]) {
+                    q.push(y), v[y] = 1;
+                }
+            }
+        }
+    }
+}
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    int mn = INF, mx = -INF;
-    for (int i = 0; i < l1; i++) {
-        mn = min(mn, a[i]);
-        mx = max(mx, a[i]);
+    int n = READ(), m = READ();
+    rep(i, 1, m) {
+        int u = READ(), v = READ(), w = READ();
+        add(u, v, w);
+        add(v, u, w);
     }
-    int mid = (mn + mx) >> 1;
-    sort(b, b + l2);
-    int rb = *lower_bound(b, b + l2, mid);
-    int lb = *upper_bound(b, b + l2, mid);
-    int ans = (rb - mid < lb - mid) ? rb : lb;
-    cout << min(abs(mn - ans), abs(mx - ans)) << endl;
+    rep(i, 1, n) {
+        v[i] = 0;
+        d[i] = 1e9;
+    }
+    int s = READ(), t = READ();
+    spfa(t);
+    printf("%.8lf", d[s]);
     return 0;
 }

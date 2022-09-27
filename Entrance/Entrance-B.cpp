@@ -1,5 +1,6 @@
 #pragma GCC optimize(3)
 #include <time.h>
+
 #include <algorithm>
 #include <bitset>
 #include <cctype>
@@ -34,8 +35,8 @@ inline int READ() {
     return ans;
 }
 
-#define REP(i, a, b) for (int i = (a); i <= (b); i++)
-#define PER(i, a, b) for (int i = (a); i >= (b); i--)
+#define rep(i, a, b) for (int i = (a); i <= (b); i++)
+#define per(i, a, b) for (int i = (a); i >= (b); i--)
 #define FOREACH(i, t) for (typeof(t.begin()) i = t.begin(); i != t.end(); i++)
 #define MP(x, y) make_pair(x, y)
 #define PB(x) push_back(x)
@@ -49,36 +50,32 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 100000 + 5
+#define MAXN 1000000 + 5
 ///**********************************START*********************************///
-int N, S;
-int a[MAXN];
-
-void solve() {
-    int res = N + 1;
-    int s = 1, t = 1, sum = 0;
-    for (;;) {
-        while (t <= N && sum < S) {
-            sum += a[t++];
-        }
-        if (sum < S) break;
-        res = min(t - s, res);
-        sum -= a[s++];
-    }
-    if (res > N) res = 0;
-    printf("%d\n", res);
-}
+int a[MAXN], b[MAXN];
+int g[4][4];
+int n;
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    int T = READ();
-    while (T--) {
-        CLR(a);
-        scanf("%d %d", &N, &S);
-        REP(i, 1, N) scanf("%d", &a[i]);
-        solve();
+    n = READ();
+    for (int i = 0; i < n; i++) {
+        a[i] = READ();
+        b[i] = a[i];
     }
+    sort(b, b + n);
+    int cnt = 0;
+    for (int i = 0; i < n; i++) {
+        if (a[i] == b[i])
+            g[b[i]][b[i]]++;
+        else
+            g[b[i]][a[i]]++;
+    }
+    int dswap =
+        min(g[1][2], g[2][1]) + min(g[1][3], g[3][1]) + min(g[2][3], g[3][2]);
+    int tswap = (n - g[1][1] - g[2][2] - g[3][3] - dswap * 2) / 3;
+    cout << dswap + 2 * tswap << endl;
     return 0;
 }

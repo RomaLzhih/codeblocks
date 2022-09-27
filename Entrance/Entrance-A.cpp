@@ -1,4 +1,5 @@
 #pragma GCC optimize(3)
+
 #include <time.h>
 
 #include <algorithm>
@@ -50,59 +51,29 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 10000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-struct {
-    int l, r, ans;
-} query[MAXN];
-int a[2 * MAXN], fa[2 * MAXN], d[2 * MAXN], n, m, t;
-
-void discrete() {  // read and discrete
-    cin >> n >> m;
-    for (int i = 1; i <= m; i++) {
-        char str[5];
-        scanf("%d%d%s", &query[i].l, &query[i].r, str);
-        query[i].ans = str[0] == 'o' ? 1 : 0;
-        a[++t] = query[i].l - 1;
-        a[++t] = query[i].r;
-    }
-    sort(a + 1, a + t + 1);
-    n = unique(a + 1, a + t + 1) - a - 1;
-    return;
-}
-
-void init() {
-    for (int i = 1; i <= n; i++) {
-        fa[i] = i;
-    }
-}
-
-int get(int x) {
-    if (x == fa[x]) return x;
-    int root = get(fa[x]);
-    d[x] ^= d[fa[x]];
-    return fa[x] = root;
-}
+map<string, set<string>> mp;
+vector<string> name{"Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"};
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
 #endif
-    discrete();
-    init();
-    for (int i = 1; i <= m; i++) {
-        int x = lower_bound(a + 1, a + n + 1, query[i].l - 1) - a;
-        int y = lower_bound(a + 1, a + n + 1, query[i].r) - a;
-        int p = get(x), q = get(y);
-        if (p == q) {
-            if ((d[x] ^ d[y]) != query[i].ans) {
-                cout << i - 1 << endl;
-                return 0;
-            }
-        } else {
-            fa[p] = q, d[p] = d[x] ^ d[y] ^ query[i].ans;
+    int n = READ();
+    string s1, s2;
+    for (int i = 0; i < n; i++) {
+        cin >> s1;
+        cin >> s2;
+        mp[s2].insert(s1);
+        // cout << s1 << " " << s2 << endl;
+    }
+    for (auto i : name) {
+        cout << i << endl;
+        for (auto j : mp[i]) {
+            cout << j << endl;
         }
     }
-    cout << m << endl;
+
     return 0;
 }

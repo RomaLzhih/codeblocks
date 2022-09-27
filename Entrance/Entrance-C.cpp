@@ -1,5 +1,6 @@
 #pragma GCC optimize(3)
 #include <time.h>
+
 #include <algorithm>
 #include <bitset>
 #include <cctype>
@@ -34,8 +35,8 @@ inline int READ() {
     return ans;
 }
 
-#define REP(i, a, b) for (int i = (a); i <= (b); i++)
-#define PER(i, a, b) for (int i = (a); i >= (b); i--)
+#define rep(i, a, b) for (int i = (a); i <= (b); i++)
+#define per(i, a, b) for (int i = (a); i >= (b); i--)
 #define FOREACH(i, t) for (typeof(t.begin()) i = t.begin(); i != t.end(); i++)
 #define MP(x, y) make_pair(x, y)
 #define PB(x) push_back(x)
@@ -49,35 +50,34 @@ inline int READ() {
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ((int)1000000007)
-#define MAXN 5000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int T, N;
-struct STICK {
-    int l, r;
-    bool operator<(const STICK& rhs) const {
-        return l == rhs.l ? r <= rhs.r : l < rhs.l;
-    }
-} stick[MAXN];
-int dp[MAXN];
+int f[MAXN];
+int w[MAXN];
+int v[MAXN];
 
 int main() {
-    // freopen("input.txt", "r", stdin);
-    scanf("%d", &T);
-    while (T--) {
-        CLR(dp);
-        scanf("%d", &N);
-        for (int i = 1; i <= N; i++) scanf("%d%d", &stick[i].l, &stick[i].r);
-        sort(stick + 1, stick + N + 1);
-        for (int i = 1; i <= N; i++) {
-            dp[i] = 1;
-            for (int j = 1; j < i; j++)
-                if (stick[j].r > stick[i].r) {
-                    dp[i] = max(dp[i], dp[j] + 1);
-                }
-        }
-        int ans = -1;
-        for (int i = 1; i <= N; i++) ans = max(ans, dp[i]);
-        printf("%d\n", ans);
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+#endif
+    int M = READ(), n = READ(), K = READ();
+    for (int i = 1; i <= n; i++) {
+        w[i] = READ();
+        v[i] = READ();
     }
+    memset(f, 0xcf, sizeof(f));
+    f[0] = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = M; j >= w[i]; j--)
+            for (int k = 0; k <= K; k++)
+                if (j - w[i] * k >= 0) {
+                    f[j] = max(f[j], f[j - w[i] * k] + v[i] * k);
+                    // cout << i << " " << j << " " << k << " " << f[j] << endl;
+                }
+    int ans = 0;
+    for (int i = 0; i <= M; i++) {
+        ans = max(ans, f[i]);
+    }
+    printf("%d", ans);
     return 0;
 }
