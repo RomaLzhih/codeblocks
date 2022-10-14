@@ -53,10 +53,13 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 10 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int a[MAXN];
+LL f[MAXN];
+LL dp[MAXN];
+int n;
+LL ans = -INF;
 int
 main()
 {
@@ -67,12 +70,28 @@ main()
    for( int i = 1; i <= n; i++ )
    {
       scanf( "%d", &a[i] );
-      f[i] = 1;
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
+   int k = 1;
+   dp[k] = a[1];
+   f[k] = a[1];
+   for( int i = 2; i <= n; i++ )
+   {
+      if( dp[k] < a[i] )
+      {
+         dp[++k] = a[i];
+         f[k] = f[k - 1] + a[i];
+      }  //如果比最后一个元素大，那么就添加再最后末尾处
+      else
+      {
+         int pos = lower_bound( dp + 1, dp + 1 + k, a[i] ) - dp;
+         f[pos] = max( f[pos], f[pos] - dp[pos] + a[i] );
+         dp[pos] = a[i];
+      }
+      //如果比最后一个元素小，那么就替换该序列第一个比他大的数；
+   }
    for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   cout << k << endl;
+   //    ans = k;
+   printf( "%lld\n", ans );
    return 0;
 }

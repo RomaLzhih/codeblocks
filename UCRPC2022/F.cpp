@@ -53,26 +53,100 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+map<int, int> mpx;
+map<int, int> mpy;
+int n, deg;
+double len;
+struct NODE
+{
+   int pos, num;
+};
+vector<NODE> X, Y;
+
+int
+countX()
+{
+   len *= 2;
+   int l = 0, r = 0;
+   int ans = 0;
+   int sum = 0;
+   while( r < X.size() )
+   {
+      while( r < X.size() && abs( 1.0 * X[r].pos - X[l].pos ) <= len - EPS )
+      {
+         sum += X[r].num;
+         ans = max( ans, sum );
+         r++;
+      }
+      sum -= X[l].num;
+      l++;
+      ans = max( ans, sum );
+      if( l >= X.size() ) break;
+   }
+   return ans;
+}
+
+int
+countY()
+{
+   len *= 2;
+   int l = 0, r = 0;
+   int ans = 0;
+   int sum = 0;
+   while( r < Y.size() )
+   {
+      while( r < Y.size() && abs( 1.0 * Y[r].pos - Y[l].pos ) <= len + EPS )
+      {
+         sum += Y[r].num;
+         ans = max( ans, sum );
+         r++;
+      }
+      sum -= Y[l].num;
+      l++;
+      ans = max( ans, sum );
+      if( l >= Y.size() ) break;
+   }
+   return ans;
+}
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   scanf( "%d%d", &n, &deg );
+   cin >> len;
+   int x, y;
+   rep( i, 1, n )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%d %d", &x, &y );
+      if( mpx.count( x ) )
+         mpx[x]++;
+      else
+         mpx[x] = 1;
+
+      if( mpy.count( y ) )
+         mpy[y]++;
+      else
+         mpy[y] = 1;
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+
+   for( auto i : mpx )
+   {
+      X.push_back( NODE{ i.first, i.second } );
+   }
+   for( auto i : mpy )
+   {
+      Y.push_back( NODE{ i.first, i.second } );
+   }
+
+   if( deg == 0 )
+      cout << countY() << endl;
+   else
+      cout << countX() << endl;
+
    return 0;
 }

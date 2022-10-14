@@ -53,26 +53,33 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int k;
+int c[3];
+bool flag;
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   k = READ();
+   int maxGal = ceil( 1.0 * k / 1 );
+   int maxSick = ceil( 1.0 * k / 29 );
+   int maxGalleon = ceil( 1.0 * k / ( 29 * 17 ) );
+   for( int i = 0; i < 29; i++ )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      for( int j = 0; j < 17; j++ )
+      {
+         int forGal = k - i - 29 * j;
+         if( forGal >= 0 && forGal % ( 17 * 29 ) == 0 )
+         {
+            printf( "%d %d %d", ( k - i - 29 * j ) / ( 17 * 29 ), j, i );
+            return 0;
+         }
+      }
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
    return 0;
 }

@@ -55,24 +55,46 @@ READ()
 #define MOD ( (int)1000000007 )
 #define MAXN 100000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int N;
+struct NODE
+{
+   int id;
+   LL r = 0;
+   bool
+   operator<( const NODE& b ) const
+   {
+      return r < b.r;
+   }
+} a[MAXN], b[MAXN];
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   LL x1, y1, x2, y2;
+   LL x, y;
+   scanf( "%lld %lld %lld %lld", &x1, &y1, &x2, &y2 );
+   scanf( "%d", &N );
+   rep( i, 1, N )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%lld %lld", &x, &y );
+      a[i].id = i;
+      b[i].id = i;
+
+      a[i].r = ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 );
+      b[i].r = ( x - x2 ) * ( x - x2 ) + ( y - y2 ) * ( y - y2 );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   sort( a + 1, a + N + 1 );
+   LL mx = 0;
+   LL ans = LLINF;
+
+   per( i, N, 0 )
+   {
+      ans = min( ans, a[i].r + mx );
+      if( b[a[i].id].r > mx ) mx = b[a[i].id].r;
+   }
+   cout << ans << endl;
    return 0;
 }

@@ -53,26 +53,69 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 10000 + 5
+#define MAXM 10000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+const int N = 2005, M = 4000010;
+int head[N], ver[M], edge[M], Next[M];
+LL d[N];
+int n, m, tot;
+queue<int> q;
+bool v[N];
+
+void
+add( int x, int y, int z )
+{
+   ver[++tot] = y, edge[tot] = z, Next[tot] = head[x], head[x] = tot;
+}
+
+void
+spfa( int s )
+{
+   d[s] = 100;
+   v[s] = 1;
+   q.push( s );
+   while( q.size() )
+   {
+      int x = q.front();
+      // cout << x << endl;
+      q.pop();
+      v[x] = 0;
+      for( int i = head[x]; i; i = Next[i] )
+      {
+         int y = ver[i], z = edge[i];
+         // cout << y << endl;
+         if( d[y] > d[x] + z )
+         {
+            d[y] = d[x] + z;
+            if( !v[y] )
+            {
+               q.push( y ), v[y] = 1;
+            }
+         }
+      }
+   }
+}
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   int n = READ(), m = READ(), t = READ();
+   rep( i, 1, m )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      int u = READ(), v = READ(), w = READ();
+      add( u, v, 0 );
+      add( u, v, 1 );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   rep( i, 1, n )
+   {
+      v[i] = 0;
+      d[i] = 1e9;
+   }
+   spfa( 0 );
+   printf( "%lf", d[0] );
    return 0;
 }

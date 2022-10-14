@@ -53,26 +53,46 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int n;
+struct NODE
+{
+   int id, cnt;
+   bool
+   operator<( const NODE& b ) const
+   {
+      return cnt > b.cnt;
+   }
+};
+
+vector<NODE> g1, g2, g3;
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   n = READ();
+   int id, sc, g;
+   rep( i, 1, n )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%d %d", &g, &sc );
+      if( g == 1 )
+         g1.push_back( NODE{ i, sc } );
+      else if( g == 2 )
+         g2.push_back( NODE{ i, sc } );
+      else if( g == 3 )
+         g3.push_back( NODE{ i, sc } );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   sort( g1.begin(), g1.end() );
+   sort( g2.begin(), g2.end() );
+   sort( g3.begin(), g3.end() );
+
+   printf( "%d\n", g1[0].id );
+   printf( "%d\n", g2[0].id );
+   printf( "%d", g3[0].id );
+
    return 0;
 }

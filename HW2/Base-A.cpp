@@ -53,10 +53,11 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int n;
+priority_queue<LL, std::vector<LL>, std::greater<LL>> q;
+
 int
 main()
 {
@@ -64,15 +65,23 @@ main()
    freopen( "input.txt", "r", stdin );
 #endif
    scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   LL x;
+   rep( i, 1, n )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%lld", &x );
+      q.push( x );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   LL ans = 0;
+   LL y;
+   while( q.size() >= 2 )
+   {
+      x = q.top(), q.pop();
+      y = q.top(), q.pop();
+      //   cout << x << " " << y << endl;
+      ans += 1ll * 2 * ( x + y );
+      q.push( x + y );
+   }
+   cout << ans << endl;
+
    return 0;
 }

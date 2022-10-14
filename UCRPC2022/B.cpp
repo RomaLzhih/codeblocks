@@ -53,26 +53,68 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+map<string, int> mp;
+map<int, string> newmp;
+vector<string> name{ "Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin" };
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   string s1, s2, s;
+   cin >> s1 >> s2;
+   mp[s1] = 0;
+   mp[s2] = 0;
+   while( getline( cin, s ) )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      if( s == "" ) continue;
+      if( s.find( " " ) == string::npos )
+      {
+         //  cout << s << endl;
+         mp[s] += 10;
+      }
+      else
+      {
+         //  cout << s.substr( 0, s.find_first_of( " " ) ) << endl;
+         mp[s.substr( 0, s.find_first_of( " " ) )] += 150;
+      }
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+
+   int score1 = -1, score2 = -1;
+   for( auto i : mp )
+   {
+      //   cout << i.first << " " << i.second << endl;
+      if( score1 == -1 )
+      {
+         score1 = i.second, s1 = i.first;
+      }
+      else
+      {
+         score2 = i.second, s2 = i.first;
+      }
+   }
+
+   score1 = score1 == -1 ? 0 : score1;
+   score2 = score2 == -1 ? 0 : score2;
+
+   if( score1 == score2 )
+   {
+      cout << "Tie" << endl;
+      cout << score1 << "-" << score2 << endl;
+   }
+   else if( score1 > score2 )
+   {
+      cout << s1 << " wins" << endl;
+      cout << score1 << "-" << score2 << endl;
+   }
+   else
+   {
+      cout << s2 << " wins" << endl;
+      cout << score2 << "-" << score1 << endl;
+   }
    return 0;
 }

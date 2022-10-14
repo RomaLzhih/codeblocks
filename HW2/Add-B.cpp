@@ -53,26 +53,81 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 4000000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+struct NODE
+{
+   long long l, r;
+   bool
+   operator<( const NODE& b ) const
+   {
+      return l < b.l;
+   }
+} inv[MAXN];
+
+struct NEWNODE
+{
+   LL l, r;
+   bool
+   operator<( const NEWNODE& b ) const
+   {
+      return r > b.r;
+   }
+};
+
+priority_queue<NEWNODE> q;
+
+LL a[MAXN];
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   int n, m, nl = 0, ml = 0;
+   scanf( "%d %d", &n, &m );
+   rep( i, 1, n )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%lld", &a[i] );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   rep( i, 1, m )
+   {
+      scanf( "%lld %lld", &inv[i].l, &inv[i].r );
+   }
+   sort( a + 1, a + n + 1 );
+   sort( inv + 1, inv + m + 1 );
+
+   int i = 1, j = 1;
+   int cnt = 0;
+   while( i <= n )
+   {
+      while( j <= m )
+      {
+         if( inv[j].l <= a[i] )
+         {
+            q.push( NEWNODE{ inv[j].l, inv[j].r } );
+            j++;
+         }
+         else
+            break;
+      }
+      while( q.size() && q.top().r < a[i] )
+      {
+         q.pop();
+      }
+
+      if( !q.size() )
+      {
+         i++;
+      }
+      else if( q.top().r >= a[i] )
+      {
+         cnt++;
+         i++;
+         q.pop();
+      }
+   }
+   cout << cnt << endl;
    return 0;
 }

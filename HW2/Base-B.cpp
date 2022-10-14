@@ -53,26 +53,56 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+int M;
+int p[MAXN];
+struct NODE
+{
+   int p, id;
+   bool
+   operator<( const NODE& b ) const
+   {
+      return p < b.p;
+   }
+} f[MAXN];
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   scanf( "%d", &M );
+   rep( i, 1, 9 )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%d", &p[i] );
+      f[i] = NODE{ p[i], i };
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   sort( f + 1, f + 9 + 1 );
+   //    rep( i, 1, 9 ) cout << f[i].p << " " << f[i].id << endl;
+   int num = M / f[1].p;
+   int I = f[1].id;
+   string ans( num, '0' + I );
+   //    cout << ans << endl;
+   int re = M - num * p[I];
+   int i = 0;
+   while( re >= 0 && i < num )
+   {
+      bool flag = false;
+      for( int j = 9; j > I; j-- )
+      {
+         if( re + p[I] - p[j] >= 0 )
+         {
+            ans[i] = '0' + j;
+            re = re + p[I] - p[j];
+            i++;
+            flag = true;
+            break;
+         }
+      }
+      if( !flag ) break;
+   }
+   cout << ans << endl;
    return 0;
 }

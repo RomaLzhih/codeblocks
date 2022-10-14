@@ -53,26 +53,30 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+map<LL, int> mp;
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+
+   int n = READ();
+   LL x;
+   rep( i, 1, n )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%lld", &x );
+      if( mp.find( x ) != mp.end() )
+         mp[x]++;
+      else
+         mp[x] = 1;
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] < a[i] ) f[i] = max( f[i], f[j] + a[i] );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   for( auto i : mp )
+   {
+      printf( "%lld %d\n", i.first, i.second );
+   }
+
    return 0;
 }
