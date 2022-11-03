@@ -53,26 +53,92 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 100 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+
+int dr[] = { 1, -1, 0, 0, 0 };
+int dc[] = { 0, 0, 1, -1, 0 };
+
+int a[MAXN][MAXN][MAXN];
+int f[MAXN][MAXN][MAXN];
+bool v[MAXN][MAXN][MAXN];
+
+int n, p, b;
+int sr, sc;
+int mxt = -1;
+
+bool
+legal( int x, int y )
+{
+   return x >= 1 && x <= n && y >= 1 && y <= n;
+}
+
+int
+dp( int x, int y, int t )
+{
+   if( v[x][y][t] != 0 ) return f[x][y][t];
+   v[x][y][t] = 1;
+   int mx = 0;
+   rep( i, 0, 4 )
+   {
+      int nx = x + dr[i];
+      int ny = y + dc[i];
+      int nt = t + 1;
+      if( legal( nx, ny ) && nt <= mxt )
+      {
+         mx = max( mx, dp( nx, ny, nt ) );
+      }
+   }
+
+   if( a[x][y][t] == 1 )
+      f[x][y][t] = mx + 1;
+   else if( a[x][y][t] == -1 )
+      f[x][y][t] = mx - ceil( 1.0 * mx / 2 );
+   else
+      f[x][y][t] = mx;
+
+   return f[x][y][t];
+}
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+
+   memset( f, 0, sizeof( f ) );
+   memset( v, 0, sizeof( v ) );
+   memset( a, 0, sizeof( a ) );
+
+   scanf( "%d %d %d", &n, &p, &b );
+   scanf( "%d %d", &sr, &sc );
+   sr++, sc++;
+   int x, y, t;
+   rep( i, 1, p )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%d %d %d", &x, &y, &t );
+      x++, y++;
+      a[x][y][t] = 1;
+      mxt = max( mxt, t );
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] > a[i] ) f[i] = max( f[i], f[j] + 1 );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   rep( i, 1, b )
+   {
+      scanf( "%d %d %d", &x, &y, &t );
+      x++, y++;
+      a[x][y][t] = -1;
+      mxt = max( mxt, t );
+   }
+
+   int ans = -1;
+
+   cout << dp( sr, sc, 0 ) << endl;
+
+   // rep( i, 1, n ) rep( j, 1, n ) ans = max( ans, f[i][j][1] );
+
+   // rep( i, 1, n ) rep( j, 1, n ) rep( t, 1, mxt ) cout
+   //     << i << " " << j << " " << t << " " << f[i][j][t] << endl;
+
+   // cout << ans << endl;
    return 0;
 }

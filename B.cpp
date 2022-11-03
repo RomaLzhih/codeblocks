@@ -53,26 +53,55 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100000 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-int a[MAXN], f[MAXN];
-int n, ans = -INF;
+
+int dr[] = { 1, -1, 0, 0 };
+int dc[] = { 0, 0, 1, -1 };
+
+LL a[MAXN][MAXN];
+int f[MAXN][MAXN];
+
+int n, m;
+
+bool
+legal( int x, int y )
+{
+   return x >= 1 && x <= n && y >= 1 && y <= m;
+}
+
+int
+dp( int x, int y )
+{
+   if( f[x][y] != 1 ) return f[x][y];
+   int mx = 0;
+   rep( i, 0, 3 )
+   {
+      int nx = x + dr[i];
+      int ny = y + dc[i];
+      if( legal( nx, ny ) && a[x][y] > a[nx][ny] )
+      {
+         mx = max( mx, dp( nx, ny ) + 1 );
+      }
+   }
+   f[x][y] = mx;
+   return f[x][y];
+}
+
 int
 main()
 {
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   scanf( "%d", &n );
-   for( int i = 1; i <= n; i++ )
+   scanf( "%d %d", &n, &m );
+   rep( i, 1, n ) rep( j, 1, m )
    {
-      scanf( "%d", &a[i] );
-      f[i] = 1;
+      scanf( "%lld", &a[i][j] );
+      f[i][j] = 1;
    }
-   for( int i = 1; i <= n; i++ )
-      for( int j = 1; j < i; j++ )
-         if( a[j] > a[i] ) f[i] = max( f[i], f[j] + 1 );
-   for( int i = 1; i <= n; i++ ) ans = max( ans, f[i] );
-   printf( "%d\n", ans );
+   int ans = -1;
+   rep( i, 1, n ) rep( j, 1, m ) ans = max( ans, dp( i, j ) + 1 );
+   cout << ans << endl;
    return 0;
 }
