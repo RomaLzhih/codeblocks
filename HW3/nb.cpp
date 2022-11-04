@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <bitset>
 #include <cctype>
+#include <climits>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -53,52 +54,11 @@ READ()
 #define pii pair<int, int>
 #define pll pair<LL, LL>
 #define MOD ( (int)1000000007 )
-#define MAXN 100 + 5
+#define MAXN 1000 + 5
 ///**********************************START*********************************///
-
-int dr[] = { 1, -1, 0, 0, 0 };
-int dc[] = { 0, 0, 1, -1, 0 };
-
-int a[MAXN][MAXN][MAXN];
-int f[MAXN][MAXN][MAXN];
-bool v[MAXN][MAXN][MAXN];
-
-int n, p, b;
-int sr, sc;
-int mxt = -1;
-
-bool
-legal( int x, int y )
-{
-   return x >= 1 && x <= n && y >= 1 && y <= n;
-}
-
-int
-dp( int x, int y, int t )
-{
-   if( v[x][y][t] != 0 ) return f[x][y][t];
-   v[x][y][t] = 1;
-   int mx = 0;
-   rep( i, 0, 4 )
-   {
-      int nx = x + dr[i];
-      int ny = y + dc[i];
-      int nt = t + 1;
-      if( legal( nx, ny ) && nt <= mxt )
-      {
-         mx = max( mx, dp( nx, ny, nt ) );
-      }
-   }
-
-   if( a[x][y][t] == 1 )
-      f[x][y][t] = mx + 1;
-   else if( a[x][y][t] == -1 )
-      f[x][y][t] = mx - ceil( 1.0 * mx / 2 );
-   else
-      f[x][y][t] = mx;
-
-   return f[x][y][t];
-}
+int dp[105][400005];
+int s[105], f[105];
+int n;
 
 int
 main()
@@ -106,39 +66,35 @@ main()
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
+   CLR( dp );
+   scanf( "%d", &n );
+   rep( i, 1, n ) scanf( "%d %d", &s[i], &f[i] );
 
-   memset( f, 0, sizeof( f ) );
-   memset( v, 0, sizeof( v ) );
-   memset( a, 0, sizeof( a ) );
+   int up = 4 * n * 1000;
+   int base = up >> 1;
 
-   scanf( "%d %d %d", &n, &p, &b );
-   scanf( "%d %d", &sr, &sc );
-   sr++, sc++;
-   int x, y, t;
-   rep( i, 1, p )
+   rep( j, 0, up ) dp[0][j] = INT_MIN / 2;
+   dp[0][base] = 0;
+
+   rep( i, 1, n ) rep( j, 0, up )
    {
-      scanf( "%d %d %d", &x, &y, &t );
-      x++, y++;
-      a[x][y][t] = 1;
-      mxt = max( mxt, t );
-   }
-   rep( i, 1, b )
-   {
-      scanf( "%d %d %d", &x, &y, &t );
-      x++, y++;
-      a[x][y][t] = -1;
-      mxt = max( mxt, t );
+      dp[i][j] = dp[i - 1][j];
+      int tmp = j - ( s[i] - f[i] );
+      if( tmp >= 0 && tmp <= up )
+      {
+         dp[i][j] = max( dp[i][j], dp[i - 1][tmp] + ( s[i] + f[i] ) );
+      }
    }
 
-   int ans = -1;
-
-   cout << dp( sr, sc, 0 ) << endl;
-
-   // rep( i, 1, n ) rep( j, 1, n ) ans = max( ans, f[i][j][1] );
-
-   // rep( i, 1, n ) rep( j, 1, n ) rep( t, 1, mxt ) cout
-   //     << i << " " << j << " " << t << " " << f[i][j][t] << endl;
-
-   // cout << ans << endl;
+   int ans = 0;
+   rep( j, 0, up )
+   {
+      int diff = j - base;
+      int sum = dp[n][j];
+      int sumS = ( sum + diff ) >> 1;
+      int sumF = ( sum - diff ) >> 1;
+      if( sumS >= 0 && sumF >= 0 && dp[n][j] >= 0 ) ans = max( ans, dp[n][j] );
+   }
+   cout << ans << endl;
    return 0;
 }
