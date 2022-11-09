@@ -94,12 +94,9 @@ checkWin( string a, char c )
 int
 dfs( string s, int cur )
 {
-   if( checkWin( s, 'O' ) )
-      return 1;
-   else if( checkWin( s, 'X' ) )
-      return -1;
-   else if( (int)std::count( s.begin(), s.end(), '#' ) == 0 )
-      return 0;
+   if( checkWin( s, 'O' ) ) return 1;
+   if( checkWin( s, 'X' ) ) return -1;
+   if( (int)std::count( s.begin(), s.end(), '#' ) == 0 ) return 0;
 
    bool draw = false;
    for( int i = 0; i < 9; i++ )
@@ -110,7 +107,7 @@ dfs( string s, int cur )
       int res = dfs( s, -cur );
       s[i] = '#';
       if( res == cur ) return res;
-      if( res == 0 ) draw = true;
+      if( res == -1 ) draw = true;
    }
    if( draw )
       return 0;
