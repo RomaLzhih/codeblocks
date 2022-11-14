@@ -52,9 +52,10 @@ main()
    while( r <= n )
    {
       s.insert( a[r] );
-      while( *s.rbegin() - *s.begin() > k )
+      while( k < ( *s.rbegin() - *s.begin() ) )
       {
-         s.erase( s.find( a[l] ) );
+         auto it = s.find( a[l] );
+         s.erase( it );
          l++;
       }
       ans = max( ans, r - l + 1 );
