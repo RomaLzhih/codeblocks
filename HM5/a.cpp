@@ -33,8 +33,28 @@ const double EPS = 1e-9;
 #define Lson ( index * 2 )
 #define Rson ( index * 2 + 1 )
 #define MOD ( (int)1000000007 )
-#define MAXN 1000 + 5
+#define MAXN 100000 + 5
+#define MAXM 1000000 + 5
 ///**********************************START*********************************///
+struct rec
+{
+   int x, y, z;
+} edge[MAXM];
+
+int fa[MAXN], n, m, ans = -1;
+
+bool
+operator<( rec a, rec b )
+{
+   return a.z < b.z;
+}
+
+int
+get( int x )
+{
+   if( x == fa[x] ) return x;
+   return fa[x] = get( fa[x] );
+}
 
 int
 main()
@@ -42,6 +62,19 @@ main()
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
+   scanf( "%d %d", &n, &m );
+   rep( i, 1, m ) scanf( "%d %d %d", &edge[i].x, &edge[i].y, &edge[i].z );
+   sort( edge + 1, edge + m + 1 );
+   rep( i, 1, n ) fa[i] = i;
+   rep( i, 1, m )
+   {
+      int x = get( edge[i].x );
+      int y = get( edge[i].y );
+      if( x == y ) continue;
+      fa[x] = y;
+      ans = max( ans, edge[i].z );
+   }
+   cout << ans << endl;
 
    return 0;
 }
