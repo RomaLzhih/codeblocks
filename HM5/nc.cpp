@@ -101,7 +101,7 @@ struct Dinic
    void
    print()
    {
-      }
+   }
    int
    Maxflow( int s, int t )
    {
