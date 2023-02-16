@@ -4,7 +4,13 @@
 #include <string.h>
 #include <time.h>
 
-#define MAX_DIM 3
+#include <queue>
+
+#define MAX_DIM 6
+
+int K;
+std::priority_queue<double> q;
+
 struct kd_node_t
 {
    double x[MAX_DIM];
@@ -82,7 +88,7 @@ make_tree( struct kd_node_t *t, int len, int i, int dim )
    return n;
 }
 
-/* global variable, so sue me */
+/* global variable, so use me */
 int visited;
 
 void
@@ -127,22 +133,30 @@ main( void )
 {
    int i;
    struct kd_node_t wp[] = {
-       { { 0, 0 } }, { { 1, 1 } }, { { 2, 2 } }, { { 3, 3 } }, { { 4, 4 } } };
-   struct kd_node_t testNode = { { 5, 5 } };
+       { { -30256895.771537, -188498875.546657, -934589771.112173 } },
+       { { -257940191.424180, -370268489.887961, -430962755.966749 } },
+       { { -360285956.184535, 162448009.822708, -463563741.924728 } },
+       { { -841003744.119359, 581308628.858605, 471030699.413780 } } };
+   struct kd_node_t testNode = {
+       { -740544115.727460, -562253846.301237, 877933190.625700 } };
    struct kd_node_t *root, *found, *million;
    double best_dist;
 
-   root = make_tree( wp, sizeof( wp ) / sizeof( wp[1] ), 0, 2 );
+   root = make_tree( wp, sizeof( wp ) / sizeof( wp[1] ), 0, 3 );
 
    visited = 0;
    found = 0;
-   nearest( root, &testNode, 0, 2, &found, &best_dist );
+   nearest( root, &testNode, 0, 3, &found, &best_dist );
+
+   q.push( 0.00001 );
+   q.push( 0.00002 );
+   printf( "%f\n", q.top() );
 
    printf(
-       ">> WP tree\nsearching for (%g, %g)\n"
-       "found (%g, %g) dist %g\nseen %d nodes\n\n",
-       testNode.x[0], testNode.x[1], found->x[0], found->x[1],
-       sqrt( best_dist ), visited );
+       ">> WP tree\nsearching for (%f, %f, %f)\n"
+       "found (%f, %f, %f) dist %f\nseen %d nodes\n\n",
+       testNode.x[0], testNode.x[1], testNode.x[2], found->x[0], found->x[1],
+       found->x[2], sqrt( best_dist ), visited );
 
    million = (struct kd_node_t *)calloc( N, sizeof( struct kd_node_t ) );
    srand( time( 0 ) );
