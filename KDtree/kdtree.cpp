@@ -92,15 +92,20 @@ struct kd_node_t *
 make_tree( struct kd_node_t *t, int len, int i, int dim )
 {
    struct kd_node_t *n;
-
+   int nl = len >> 1;
    if( !len ) return 0;
 
-   if( ( n = find_median( t, t + len, i ) ) )
-   {
-      i = ( i + 1 ) % dim;
-      n->left = make_tree( t, n - t, i, dim );
-      n->right = make_tree( n + 1, t + len - ( n + 1 ), i, dim );
-   }
+   // std::sort( t, t + len, node_cmp( i ) );
+   // i = ( i + 1 ) % dim;
+   // n = t + ( len >> 1 );
+   // n->left = make_tree( t, n - t, i, dim );
+   // n->right = make_tree( n + 1, t + len - ( n + 1 ), i, dim );
+
+   n = find_median( t, t + len, i );
+   i = ( i + 1 ) % dim;
+   n->left = make_tree( t, n - t, i, dim );
+   n->right = make_tree( n + 1, t + len - ( n + 1 ), i, dim );
+
    return n;
 }
 
