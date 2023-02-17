@@ -44,21 +44,21 @@ swap( struct kd_node_t *x, struct kd_node_t *y )
    memcpy( x->x, y->x, sizeof( tmp ) );
    memcpy( y->x, tmp, sizeof( tmp ) );
 }
-
+// https://www.geeksforgeeks.org/median-of-an-unsorted-array-in-liner-time-on/
 struct kd_node_t *
 find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
 {
    if( end <= start ) return NULL;
    if( end == start + 1 ) return start;
 
-   struct kd_node_t *p, *store, *md = start + ( end - start ) / 2;
+   struct kd_node_t *p, *store, *md = start + ( ( end - start ) / 2 );
    long double pivot;
    while( 1 )
    {
       pivot = md->x[idx];
 
       swap( md, end - 1 );
-      for( store = p = start; p < end; p++ )
+      for( store = p = start; p < end - 1; p++ )
       {
          if( p->x[idx] - pivot < -eps )
          {
@@ -68,7 +68,8 @@ find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
       }
       swap( store, end - 1 );
 
-      if( store->x[idx] == md->x[idx] ) return md;
+      // if( store->x[idx] == md->x[idx] ) return md;
+      if( store - start == md - start ) return md;
 
       if( store > md )
          end = store;
