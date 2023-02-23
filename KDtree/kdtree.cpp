@@ -1,5 +1,7 @@
 #pragma GCC optimize( 3 )
 
+#include <float.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +22,17 @@ struct kd_node_t
 {
    long double x[MAX_DIM];
    struct kd_node_t *left, *right;
+};
+
+struct node_cmp
+{
+   node_cmp( size_t index ) : index_( index ) {}
+   bool
+   operator()( const kd_node_t &n1, const kd_node_t &n2 ) const
+   {
+      return n1.x[index_] < n2.x[index_];
+   }
+   size_t index_;
 };
 
 struct kd_node_t *root, *found, wp[MAXN];
@@ -80,17 +93,6 @@ find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
    }
 }
 
-struct node_cmp
-{
-   node_cmp( size_t index ) : index_( index ) {}
-   bool
-   operator()( const kd_node_t &n1, const kd_node_t &n2 ) const
-   {
-      return n1.x[index_] < n2.x[index_];
-   }
-   size_t index_;
-};
-
 struct kd_node_t *
 make_tree( struct kd_node_t *t, int len, int i, int dim )
 {
@@ -115,7 +117,7 @@ make_tree( struct kd_node_t *t, int len, int i, int dim )
 }
 
 void
-nearest( struct kd_node_t *root, struct kd_node_t *nd, int i, int dim )
+k_nearest( struct kd_node_t *root, struct kd_node_t *nd, int i, int dim )
 {
    long double d, dx, dx2;
 
@@ -133,9 +135,80 @@ nearest( struct kd_node_t *root, struct kd_node_t *nd, int i, int dim )
 
    if( ++i >= dim ) i = 0;
 
-   nearest( dx > 0 ? root->left : root->right, nd, i, dim );
+   k_nearest( dx > 0 ? root->left : root->right, nd, i, dim );
    if( dx2 - q.top() >= eps && q.size() >= K ) return;
-   nearest( dx > 0 ? root->right : root->left, nd, i, dim );
+   k_nearest( dx > 0 ? root->right : root->left, nd, i, dim );
+}
+
+void
+nearest( struct kd_node_t *root, struct kd_node_t *nd, long double &nDist,
+         int i, int dim )
+{
+   long double d, dx, dx2;
+
+   if( !root ) return;
+   d = dist( root, nd, dim );
+   dx = root->x[i] - nd->x[i];
+   dx2 = dx * dx;
+
+   if( d < nDist ) nDist = d;
+   if( ++i >= dim ) i = 0;
+   nearest( dx > 0 ? root->left : root->right, nd, nDist, i, dim );
+   if( dx2 - nDist >= eps ) return;
+   nearest( dx > 0 ? root->right : root->left, nd, nDist, i, dim );
+}
+
+void
+rangeQuery()
+{
+}
+
+void
+query_k_Nearest()
+{
+   int i, j;
+   scanf( "%d", &Q );
+   struct kd_node_t z;
+   while( Q-- )
+   {
+      scanf( "%d", &K );
+      for( j = 0; j < Dim; j++ ) scanf( "%Lf", &z.x[j] );
+      while( !q.empty() ) q.pop();
+      k_nearest( root, &z, 0, Dim );
+      // printf( "%ld\n", q.size() );
+      printf( "%.8Lf\n", sqrt( q.top() ) );
+   }
+}
+
+void
+queryNearest()
+{
+   int i, j;
+   scanf( "%d", &Q );
+   struct kd_node_t z;
+   while( Q-- )
+   {
+      long double nDist = LDBL_MAX;
+      scanf( "%d", &K );
+      for( j = 0; j < Dim; j++ ) scanf( "%Lf", &z.x[j] );
+      nearest( root, &z, nDist, 0, Dim );
+      // printf( "%ld\n", q.size() );
+      printf( "%.8Lf\n", sqrt( nDist ) );
+
+      //* check
+      for( int i = 0; i < N; i++ )
+      {
+         if( dist( wp + i, &z, Dim ) - nDist < -eps )
+         {
+            printf( "wrong\n" );
+         }
+      }
+   }
+}
+
+void
+queryRangePoints()
+{
 }
 
 int
@@ -157,18 +230,8 @@ main( void )
    }
 
    root = make_tree( wp, N, 0, Dim );
-
-   scanf( "%d", &Q );
-   struct kd_node_t z;
-   while( Q-- )
-   {
-      scanf( "%d", &K );
-      for( j = 0; j < Dim; j++ ) scanf( "%Lf", &z.x[j] );
-      while( !q.empty() ) q.pop();
-      nearest( root, &z, 0, Dim );
-      // printf( "%ld\n", q.size() );
-      printf( "%.8Lf\n", sqrt( q.top() ) );
-   }
+   queryNearest();
+   // querykNearest();
 
    return 0;
 }
