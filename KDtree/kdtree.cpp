@@ -44,7 +44,19 @@ Lt( const long double &a, const long double &b )
 inline bool
 Eq( const long double &a, const long double &b )
 {
-   return abs( a - b ) < eps;
+   return std::abs( a - b ) < eps;
+}
+
+inline bool
+Geq( const long double &a, const long double &b )
+{
+   return Gt( a, b ) || Eq( a, b );
+}
+
+inline bool
+Leq( const long double &a, const long double &b )
+{
+   return Lt( a, b ) || Eq( a, b );
 }
 
 struct kd_node_t *root, *found, wp[MAXN];
@@ -138,8 +150,10 @@ make_tree( struct kd_node_t *a, int len, int i, int dim )
    if( root->left ) augment( root, root->left, dim );
    if( root->right ) augment( root, root->right, dim );
 
-   // printf( "%Lf %d\n", root->x[0], root->num );
-
+   // std::cout << root->x[0] << " " << root->num << std::endl;
+   // for( int i = 0; i < dim; i++ )
+   //    std::cout << root->mxx[i] << " " << root->mnx[i] << std::endl;
+   // puts( "---" );
    return root;
 }
 
@@ -285,7 +299,7 @@ queryRangePoints()
       for( j = 0; j < Dim; j++ )
       {
          scanf( "%Lf %Lf", &zl.x[j], &zr.x[j] );
-         if( zl.x[j] < zr.x[j] ) std::swap( zl.x[j], zr.x[j] );
+         if( Gt( zl.x[j], zr.x[j] ) ) std::swap( zl.x[j], zr.x[j] );
       }
       rangeQuery( root, &zl, &zr, cnt, 0, Dim );
       printf( "%d\n", cnt );
