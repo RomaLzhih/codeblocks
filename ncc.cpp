@@ -16,11 +16,9 @@ main()
 #ifndef ONLINE_JUDGE
    freopen( "input.txt", "r", stdin );
 #endif
-   int a[] = { 1, 2, 3, 4, 5, 6, 7 };
-   int *b = a + 1;
-   int *c = a + 2;
-   swap( b, c );
-   cout << ( c > b ) << endl;
-
+   int a = 1;
+   int b = 1;
+   b = a = 2;
+   cout << b << endl;
    return 0;
 }

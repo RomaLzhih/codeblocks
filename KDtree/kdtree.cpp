@@ -13,7 +13,9 @@ struct kd_node_t
 {
    long double x[MAX_DIM];
    struct kd_node_t *left, *right;
-   int num;  // number of nodes in subtree plus itself
+   int num;                   // number of nodes in subtree plus itself
+   long double mxx[MAX_DIM];  // mxx[i] the maximum of sub points on dimension i
+   long double mnx[MAX_DIM];  // mnx[i] the minimum
 };
 
 struct node_cmp
@@ -103,32 +105,42 @@ find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
    }
 }
 
+void
+augment( kd_node_t *a, kd_node_t *b, int dim )
+{
+   for( int i = 0; i < dim; i++ )
+   {
+      a->mxx[i] = Gt( a->mxx[i], b->mxx[i] ) ? a->mxx[i] : b->mxx[i];
+      a->mnx[i] = Lt( a->mnx[i], b->mnx[i] ) ? a->mnx[i] : b->mnx[i];
+   }
+   a->num += b->num;
+   return;
+}
+
 struct kd_node_t *
 make_tree( struct kd_node_t *a, int len, int i, int dim )
 {
-   struct kd_node_t *r;
+   struct kd_node_t *root;
    if( !len ) return 0;
 
    // std::sort( a, a + len, node_cmp( i ) );
 
    std::nth_element( a, a + len / 2, a + len, node_cmp( i ) );
    i = ( i + 1 ) % dim;
-   r = a + ( len >> 1 );
-   r->left = make_tree( a, r - a, i, dim );
-   r->right = make_tree( r + 1, a + len - ( r + 1 ), i, dim );
+   root = a + ( len >> 1 );
+   root->left = make_tree( a, root - a, i, dim );
+   root->right = make_tree( root + 1, a + len - ( root + 1 ), i, dim );
 
-   if( !r->left && !r->right )
-      r->num = 0;
-   else if( !r->left || !r->right )
-      r->num = r->left ? r->left->num : r->right->num;
-   else
-      r->num = r->left->num + r->right->num;
+   //* begin augment
+   for( int i = 0; i < dim; i++ ) root->mnx[i] = root->mxx[i] = root->x[i];
+   root->num = 1;
 
-   r->num += 1;  // add itself
+   if( root->left ) augment( root, root->left, dim );
+   if( root->right ) augment( root, root->right, dim );
 
-   // printf( "%Lf %d\n", r->x[0], r->num );
+   // printf( "%Lf %d\n", root->x[0], root->num );
 
-   return r;
+   return root;
 }
 
 void
@@ -218,12 +230,24 @@ queryNearest()
 }
 
 inline bool
-pointWithinRectangle( struct kd_node_t *root, struct kd_node_t *L,
-                      struct kd_node_t *R, int dim )
+coverSingle( struct kd_node_t *root, struct kd_node_t *L, struct kd_node_t *R,
+             int dim )
 {
    for( int i = 0; i < dim; i++ )
    {
       if( Lt( root->x[i], L->x[i] ) || Gt( root->x[i], R->x[i] ) ) return false;
+   }
+   return true;
+}
+
+inline bool
+coverMultiple( struct kd_node_t *root, struct kd_node_t *L, struct kd_node_t *R,
+               int dim )
+{
+   for( int i = 0; i < dim; i++ )
+   {
+      if( Lt( root->mnx[i], L->x[i] ) || Gt( root->mxx[i], R->x[i] ) )
+         return false;
    }
    return true;
 }
@@ -233,8 +257,13 @@ rangeQuery( struct kd_node_t *root, struct kd_node_t *L, struct kd_node_t *R,
             int &cnt, int i, int dim )
 {
    if( !root ) return;
+   if( coverMultiple( root, L, R, dim ) )
+   {
+      cnt += root->num;
+      return;
+   }
 
-   cnt += (int)pointWithinRectangle( root, L, R, dim );
+   cnt += (int)coverSingle( root, L, R, dim );
    if( ++i >= dim ) i = 0;
 
    if( !Gt( L->x[i], root->x[i] ) ) rangeQuery( root->left, L, R, cnt, i, dim );
@@ -255,8 +284,8 @@ queryRangePoints()
       scanf( "%d", &K );
       for( j = 0; j < Dim; j++ )
       {
-         //! default zl < zj
          scanf( "%Lf %Lf", &zl.x[j], &zr.x[j] );
+         if( zl.x[j] < zr.x[j] ) std::swap( zl.x[j], zr.x[j] );
       }
       rangeQuery( root, &zl, &zr, cnt, 0, Dim );
       printf( "%d\n", cnt );
