@@ -1,15 +1,6 @@
 #pragma GCC optimize( 3 )
 
-#include <float.h>
-#include <limits.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include <algorithm>
-#include <queue>
+#include <bits/stdc++.h>
 
 #define MAX_DIM 6
 #define MAXN 100000 + 5
@@ -22,6 +13,7 @@ struct kd_node_t
 {
    long double x[MAX_DIM];
    struct kd_node_t *left, *right;
+   int num;  // number of nodes in subtree plus itself
 };
 
 struct node_cmp
@@ -34,6 +26,24 @@ struct node_cmp
    }
    size_t index_;
 };
+
+inline bool
+Gt( const long double &a, const long double &b )
+{
+   return a - b > eps;
+}
+
+inline bool
+Lt( const long double &a, const long double &b )
+{
+   return a - b < -eps;
+}
+
+inline bool
+Eq( const long double &a, const long double &b )
+{
+   return abs( a - b ) < eps;
+}
 
 struct kd_node_t *root, *found, wp[MAXN];
 
@@ -50,7 +60,7 @@ dist( struct kd_node_t *a, struct kd_node_t *b, int dim )
 }
 
 inline void
-swap( struct kd_node_t *x, struct kd_node_t *y )
+swap_node( struct kd_node_t *x, struct kd_node_t *y )
 {
    long double tmp[MAX_DIM];
    memcpy( tmp, x->x, sizeof( tmp ) );
@@ -74,16 +84,16 @@ find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
    {
       pivot = md->x[idx];
 
-      swap( md, end - 1 );
+      swap_node( md, end - 1 );
       for( store = p = start; p < end - 1; p++ )
       {
          if( p->x[idx] - pivot < -eps )
          {
-            if( p != store ) swap( p, store );
+            if( p != store ) swap_node( p, store );
             store++;
          }
       }
-      swap( store, end - 1 );
+      swap_node( store, end - 1 );
 
       if( store->x[idx] == md->x[idx] ) return md;
       if( abs( store - bk ) > abs( md - bk ) )
@@ -94,26 +104,31 @@ find_median( struct kd_node_t *start, struct kd_node_t *end, int idx )
 }
 
 struct kd_node_t *
-make_tree( struct kd_node_t *t, int len, int i, int dim )
+make_tree( struct kd_node_t *a, int len, int i, int dim )
 {
-   struct kd_node_t *n;
-   int nl = len >> 1;
+   struct kd_node_t *r;
    if( !len ) return 0;
 
-   // std::sort( t, t + len, node_cmp( i ) );
+   // std::sort( a, a + len, node_cmp( i ) );
 
-   std::nth_element( t, t + len / 2, t + len, node_cmp( i ) );
+   std::nth_element( a, a + len / 2, a + len, node_cmp( i ) );
    i = ( i + 1 ) % dim;
-   n = t + ( len >> 1 );
-   n->left = make_tree( t, n - t, i, dim );
-   n->right = make_tree( n + 1, t + len - ( n + 1 ), i, dim );
+   r = a + ( len >> 1 );
+   r->left = make_tree( a, r - a, i, dim );
+   r->right = make_tree( r + 1, a + len - ( r + 1 ), i, dim );
 
-   // n = find_median( t, t + len, i );
-   // i = ( i + 1 ) % dim;
-   // n->left = make_tree( t, n - t, i, dim );
-   // n->right = make_tree( n + 1, t + len - ( n + 1 ), i, dim );
+   if( !r->left && !r->right )
+      r->num = 0;
+   else if( !r->left || !r->right )
+      r->num = r->left ? r->left->num : r->right->num;
+   else
+      r->num = r->left->num + r->right->num;
 
-   return n;
+   r->num += 1;  // add itself
+
+   // printf( "%Lf %d\n", r->x[0], r->num );
+
+   return r;
 }
 
 void
@@ -140,6 +155,7 @@ k_nearest( struct kd_node_t *root, struct kd_node_t *nd, int i, int dim )
    k_nearest( dx > 0 ? root->right : root->left, nd, i, dim );
 }
 
+// nd: node used to query
 void
 nearest( struct kd_node_t *root, struct kd_node_t *nd, long double &nDist,
          int i, int dim )
@@ -159,11 +175,6 @@ nearest( struct kd_node_t *root, struct kd_node_t *nd, long double &nDist,
 }
 
 void
-rangeQuery()
-{
-}
-
-void
 query_k_Nearest()
 {
    int i, j;
@@ -176,7 +187,7 @@ query_k_Nearest()
       while( !q.empty() ) q.pop();
       k_nearest( root, &z, 0, Dim );
       // printf( "%ld\n", q.size() );
-      printf( "%.8Lf\n", sqrt( q.top() ) );
+      printf( "%.8Lf\n", sqrtl( q.top() ) );
    }
 }
 
@@ -193,7 +204,7 @@ queryNearest()
       for( j = 0; j < Dim; j++ ) scanf( "%Lf", &z.x[j] );
       nearest( root, &z, nDist, 0, Dim );
       // printf( "%ld\n", q.size() );
-      printf( "%.8Lf\n", sqrt( nDist ) );
+      printf( "%.8Lf\n", sqrtl( nDist ) );
 
       //* check
       for( int i = 0; i < N; i++ )
@@ -206,9 +217,52 @@ queryNearest()
    }
 }
 
+inline bool
+pointWithinRectangle( struct kd_node_t *root, struct kd_node_t *L,
+                      struct kd_node_t *R, int dim )
+{
+   for( int i = 0; i < dim; i++ )
+   {
+      if( Lt( root->x[i], L->x[i] ) || Gt( root->x[i], R->x[i] ) ) return false;
+   }
+   return true;
+}
+
+void
+rangeQuery( struct kd_node_t *root, struct kd_node_t *L, struct kd_node_t *R,
+            int &cnt, int i, int dim )
+{
+   if( !root ) return;
+
+   cnt += (int)pointWithinRectangle( root, L, R, dim );
+   if( ++i >= dim ) i = 0;
+
+   if( !Gt( L->x[i], root->x[i] ) ) rangeQuery( root->left, L, R, cnt, i, dim );
+   if( !Lt( R->x[i], root->x[i] ) )
+      rangeQuery( root->right, L, R, cnt, i, dim );
+   return;
+}
+
 void
 queryRangePoints()
 {
+   int i, j;
+   scanf( "%d", &Q );
+   struct kd_node_t zl, zr;
+   while( Q-- )
+   {
+      int cnt = 0;
+      scanf( "%d", &K );
+      for( j = 0; j < Dim; j++ )
+      {
+         //! default zl < zj
+         scanf( "%Lf %Lf", &zl.x[j], &zr.x[j] );
+      }
+      rangeQuery( root, &zl, &zr, cnt, 0, Dim );
+      printf( "%d\n", cnt );
+
+      //* check
+   }
 }
 
 int
@@ -230,8 +284,9 @@ main( void )
    }
 
    root = make_tree( wp, N, 0, Dim );
-   queryNearest();
-   // querykNearest();
+   // queryNearest();
+   // query_k_Nearest();
+   queryRangePoints();
 
    return 0;
 }
